@@ -1,12 +1,12 @@
-import Device, * as device from './device';
-import * as event from './event';
+import Device, * as device from "./device";
+import * as event from "./event";
 
-const check = async (fetcher: device.fetcher, callback: event.consumer, previous: device.map = {}) => {
+const check = async (fetcher: device.fetcher, callback: event.consumer, previous: device.Map = {}) => {
     const list = await fetcher();
 
-    const current: device.map = {};
-    list.forEach((device) => {
-        current[device.getID()] = device;
+    const current: device.Map = {};
+    list.forEach((d) => {
+        current[d.getID()] = d;
     });
 
     const ids = Object.keys(
@@ -33,7 +33,7 @@ const check = async (fetcher: device.fetcher, callback: event.consumer, previous
 };
 
 export default async function loop(fetcher: device.fetcher, callback: event.consumer, interval: number = 2000) {
-    let state: device.map = {};
+    let state: device.Map = {};
     let errStreak = 0;
     while (true) {
         try {
@@ -52,4 +52,4 @@ export default async function loop(fetcher: device.fetcher, callback: event.cons
         const pause = Math.min(30 * 60 * 1000, interval * (1 + errStreak ** 1.5));
         await new Promise((res) => setTimeout(res, pause));
     }
-};
+}

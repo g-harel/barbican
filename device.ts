@@ -1,7 +1,7 @@
-export type fetcher = () => Promise<Device[]>
+export type fetcher = () => Promise<Device[]>;
 
-export type map = {
-    [key: string]: Device
+export interface Map {
+    [key: string]: Device;
 }
 
 export default class Device {
@@ -13,11 +13,11 @@ export default class Device {
         this .name = name;
     }
 
-    getID() {
+    public getID() {
         return this.id;
     }
 
-    getName() {
+    public getName() {
         return this.name;
     }
 }

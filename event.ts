@@ -1,22 +1,29 @@
-import * as uuid from 'uuid/v1';
+import * as uuid from "uuid/v1";
 
 export enum types {
-    ADDED      = 'ADDED',
-    REMOVED    = 'REMOVED',
-    DISCONNECT = 'DISCONNECT',
-    RECONNECT  = 'RECONNECT',
+    ADDED      = "ADDED",
+    REMOVED    = "REMOVED",
+    DISCONNECT = "DISCONNECT",
+    RECONNECT  = "RECONNECT",
 }
 
-export type consumer = (e: Event) => void
+export type consumer = (e: Event) => void;
 
-export type record = {
-    id:   string,
-    type: string,
-    time: number,
-    data: string,
+export interface Record {
+    id: string;
+    type: string;
+    time: number;
+    data: string;
 }
 
 export default class Event {
+    public static fromRecord(r: Record): Event {
+        const e = new Event(types[r.type], JSON.parse(r.data));
+        e.id = r.id;
+        e.time = r.time;
+        return e;
+    }
+
     private id: string;
     private type: types;
     private time: number;
@@ -29,17 +36,10 @@ export default class Event {
         this.data = data;
     }
 
-    public static fromRecord(r: record): Event {
-        const e = new Event(types[r.type], JSON.parse(r.data));
-        e.id = r.id;
-        e.time = r.time;
-        return e;
-    }
-
     public serialize(): [string, string, number, string] {
         let data = this.data;
         if (data === undefined || data === null) {
-            data = '';
+            data = "";
         }
         data = JSON.stringify(data);
 
