@@ -1,10 +1,10 @@
 import * as uuid from "uuid/v1";
 
+import Device from "./device";
+
 export enum types {
     ADDED      = "ADDED",
     REMOVED    = "REMOVED",
-    DISCONNECT = "DISCONNECT",
-    RECONNECT  = "RECONNECT",
 }
 
 export type consumer = (e: Event) => void;
@@ -18,7 +18,9 @@ export interface Record {
 
 export default class Event {
     public static fromRecord(r: Record): Event {
-        const e = new Event(types[r.type], JSON.parse(r.data));
+        const d = JSON.parse(r.data);
+        const device = new Device(d.id, d.name);
+        const e = new Event(types[r.type], device);
         e.id = r.id;
         e.time = r.time;
         return e;
@@ -27,23 +29,17 @@ export default class Event {
     private id: string;
     private type: types;
     private time: number;
-    private data: any;
+    private device: any;
 
-    protected constructor(type: types, data: any) {
+    protected constructor(type: types, device: Device) {
         this.id = uuid();
         this.type = type;
         this.time = Date.now();
-        this.data = data;
+        this.device = device;
     }
 
     public serialize(): [string, string, number, string] {
-        let data = this.data;
-        if (data === undefined || data === null) {
-            data = "";
-        }
-        data = JSON.stringify(data);
-
-        return [this.id, types[this.type], this.time, data];
+        return [this.id, types[this.type], this.time, JSON.stringify(this.device)];
     }
 
     public getID(): string {
@@ -54,35 +50,27 @@ export default class Event {
         return this.type;
     }
 
-    public getTime(): Date {
+    public getTime(): number {
+        return this.time;
+    }
+
+    public getDate(): Date {
         return new Date(this.time);
     }
 
-    public getData(): any {
-        return this.data;
+    public getDevice(): any {
+        return this.device;
     }
 }
 
 export class Added extends Event {
-    constructor(data: any) {
-        super(types.ADDED, data);
+    constructor(device: Device) {
+        super(types.ADDED, device);
     }
 }
 
 export class Removed extends Event {
-    constructor(data: any) {
-        super(types.REMOVED, data);
-    }
-}
-
-export class Disconnect extends Event {
-    constructor(data: any) {
-        super(types.DISCONNECT, data);
-    }
-}
-
-export class Reconnect extends Event {
-    constructor(data: any) {
-        super(types.RECONNECT, data);
+    constructor(device: Device) {
+        super(types.REMOVED, device);
     }
 }

@@ -38,13 +38,13 @@ export default async function loop(fetcher: device.fetcher, callback: event.cons
     while (true) {
         try {
             state = await check(fetcher, callback, state);
-            if (errStreak !== 0) {
-                callback(new event.Reconnect({}));
-            }
             errStreak = 0;
         } catch (e) {
             if (errStreak === 0) {
-                callback(new event.Disconnect({error: e.toString()}));
+                Object.keys(state).forEach((key) => {
+                    callback(new event.Removed(state[key]));
+                });
+                state = {};
             }
             errStreak++;
         }

@@ -1,54 +1,90 @@
-import * as get from "lodash.get";
-import * as request from "request-promise";
+import * as fs from "fs";
 
-import Database from "./database";
-import Device, * as device from "./device";
-import Event, * as event from "./event";
-import loop from "./loop";
+import * as Canvas from "canvas";
 
-const db = new Database();
+import Event from "./event";
+import data from "./mock";
 
-const fetcher: device.fetcher = async () => {
-    const response = await request({
-        method: "POST",
-        uri: "http://192.168.1.1/JNAP/",
-        headers: {
-            "X-JNAP-Action": "http://linksys.com/jnap/core/Transaction",
-        },
-        body: [{
-            action: "http://linksys.com/jnap/devicelist/GetDevices",
-            request: {},
-        }],
-        json: true,
-        timeout: 2000,
-    });
+if (data.length < 1) {
+    console.error("not enough events");
+    process.exit(0);
+}
 
-    const pattern = /^[\da-f]{8}(-[\da-f]{4}){3}-[\da-f]{12}$/g;
+const formattedDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-    return get(response, "responses[0].output.devices", [])
-        // remove non-connected devices
-        .filter(({ connections }) => {
-            return !!connections.length;
-        })
-        // remove noise
-        .filter(({ friendlyName }) => {
-            return !friendlyName.match(pattern);
-        })
-        // remove the router
-        .filter(({ model }) => {
-            if (!model || !model.description) {
-                return true;
-            }
-            return !model.description.match(/router/gi);
-        })
-        // remove extra info
-        .map(({ deviceID, friendlyName }) => {
-            return new Device(deviceID, friendlyName);
-        });
-};
+interface Group {
+    id: string;
+    name: string;
+    events: Event[];
+}
 
-const consumer = (e: Event) => {
-    return db.insertEvent(e);
-};
+const groups: {[k: string]: Group} = {};
+data.forEach((e) => {
+    groups[e.getDevice().getID()] = Object.assign({
+        events: [],
+    }, e.getDevice());
+});
+data.forEach((e) => {
+    groups[e.getDevice().getID()].events.push(e);
+});
 
-loop(fetcher, consumer);
+const groupList = Object.keys(groups).map((k) => groups[k]);
+const numGroups = groupList.length;
+
+const fontSize = 14;
+const rowHeight = 2 * fontSize;
+
+const width = 1000 + Math.random() * 42;
+const height = rowHeight * numGroups + 100;
+
+const timeStart = data[0].getTime();
+const timeEnd = data[data.length - 1].getTime();
+const timeDelta = timeEnd - timeStart;
+const timePrecision = 24 * 60 * 60 * 1000;
+const subdivisions = Math.max(timeDelta / timePrecision, 1);
+
+const canvas = new Canvas(width, height);
+const ctx = canvas.getContext("2d");
+
+// draw background color
+ctx.fillStyle = "#cccccc";
+ctx.fillRect(0, 0, width, height);
+
+// draw group titles
+let titleWidth = 0;
+ctx.fillStyle = "#000000";
+ctx.font = fontSize + "px Courrier New";
+groupList.forEach((g, i) => {
+    ctx.fillText(g.name, 0, i * rowHeight + rowHeight / 2 + fontSize / 2);
+    titleWidth = Math.max(titleWidth, ctx.measureText(g.name).width);
+});
+
+// draw day titles
+const subdivisionWidth = (width - titleWidth) / subdivisions;
+const subdivisionStart = rowHeight * groupList.length;
+ctx.save();
+for (let i = 0; i < subdivisions; i++) {
+    const xcoord = titleWidth + subdivisionWidth * i;
+    ctx.translate(xcoord, subdivisionStart);
+    ctx.font = fontSize / 2 + "px Courrier New";
+    ctx.fillText("|", 0, 0, 200);
+    ctx.translate(-fontSize / 5, 4);
+    ctx.font = fontSize / 1.5 + "px Courrier New";
+    ctx.rotate(Math.PI / 2);
+    const date = new Date(timeStart + timePrecision * i);
+    const formattedDate = formattedDays[date.getDay()] + " " +
+                        date.getDate() + "/" +
+                        date.getMonth() + "/" +
+                        date.getFullYear();
+    ctx.fillText(formattedDate, 0, 0, 200);
+    ctx.restore();
+    ctx.save();
+}
+
+// save file
+fs.writeFileSync(
+    "out.png",
+    canvas.toDataURL()
+        .replace(/^data:image\/png;base64,/, ""),
+    "base64",
+);

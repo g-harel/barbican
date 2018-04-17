@@ -3,11 +3,10 @@
     "extends": [
         "tslint:recommended"
     ],
-    "jsRules": {},
     "rules": {
         "object-literal-sort-keys": false,
         "interface-name": false,
-        "max-classes-per-file": false
-    },
-    "rulesDirectory": []
+        "max-classes-per-file": false,
+        "no-console": false
+    }
 }
