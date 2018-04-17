@@ -31,9 +31,9 @@ const fetcher: device.fetcher = async () => {
             return !!connections.length;
         })
         // remove noise
-        .filter(({ friendlyName }) => {
-            return !friendlyName.match(pattern);
-        })
+        // .filter(({ friendlyName }) => {
+        //     return !friendlyName.match(pattern);
+        // })
         // remove the router
         .filter(({ model }) => {
             if (!model || !model.description) {
@@ -51,4 +51,6 @@ const consumer = (e: Event) => {
     return db.insertEvent(e);
 };
 
-loop(fetcher, consumer);
+export default function() {
+    loop(fetcher, consumer);
+}

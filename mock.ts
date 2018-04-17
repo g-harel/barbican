@@ -22,9 +22,9 @@ export default [
     eadd(0, 0),
     eadd(0, 1),
     eadd(0, 2),
-    erem(1, 2),
-    eadd(2, 2),
-    erem(5, 0),
-    erem(10, 1),
+    erem(120, 2),
+    eadd(240, 2),
+    erem(600, 0),
+    erem(2000, 1),
     erem(10 * 24 * 60, 2),
 ];
