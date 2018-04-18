@@ -34,7 +34,7 @@ export default function(data: Event[]): string {
     const fontSize = 14;
     const rowHeight = 2 * fontSize;
 
-    const width = 1000 + Math.random() * 42;
+    const width = 1500 + Math.random() * 42;
     const height = rowHeight * numGroups + 100;
 
     const timeStart = data[0].getTime();

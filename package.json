@@ -1,9 +1,10 @@
 {
   "scripts": {
-    "lint": "tslint *.ts",
-    "watch": "nodemon -e ts -x \"ts-node .\""
+    "lint": "tslint *.ts"
   },
   "dependencies": {
+    "@types/es6-promise": "^3.3.0",
+    "@types/node": "^9.6.5",
     "better-sqlite3": "^4.1.0",
     "canvas": "^1.6.10",
     "express": "^4.16.3",
@@ -11,11 +12,9 @@
     "nodemon": "^1.17.3",
     "request": "^2.85.0",
     "request-promise": "^4.2.2",
-    "uuid": "^3.2.1"
-  },
-  "devDependencies": {
-    "@types/node": "^9.6.5",
+    "ts-node": "^6.0.0",
     "tslint": "^5.9.1",
-    "typescript": "^2.8.1"
+    "typescript": "^2.8.1",
+    "uuid": "^3.2.1"
   }
 }

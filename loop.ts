@@ -40,6 +40,7 @@ export default async function loop(fetcher: device.fetcher, callback: event.cons
             state = await check(fetcher, callback, state);
             errStreak = 0;
         } catch (e) {
+            console.log("connection lost " + Date.now());
             if (errStreak === 0) {
                 Object.keys(state).forEach((key) => {
                     callback(new event.Removed(state[key]));
