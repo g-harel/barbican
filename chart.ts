@@ -111,7 +111,7 @@ export default function(data: Event[]): string {
                 ctx.fillStyle = "#ff0000";
             }
             const xcoord = titleWidth + (e.getTime() - timeStart) / timeDelta * (width - titleWidth);
-            ctx.fillRect(xcoord, ycoord, 1, rowHeight);
+            ctx.fillRect(xcoord, ycoord, 2, rowHeight);
             ctx.restore();
         });
     });

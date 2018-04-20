@@ -12,12 +12,14 @@ RUN apt-get -y update  && \
         build-essential   \
         g++
 
-#copies all top-level files
-COPY *.* ./
+COPY package.json ./
 
-RUN npm install --global typescript ts-node && \
-    npm install --only=production
+RUN npm install --only=production
+
+# copies all other top-level files.
+# not done earlier to use cached npm install on re-builds
+COPY dist ./
 
 EXPOSE 3210
 
-CMD ts-node server.ts
+CMD node server.js
