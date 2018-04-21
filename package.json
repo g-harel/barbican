@@ -1,7 +1,7 @@
 {
   "scripts": {
     "lint": "tslint *.ts",
-    "build": "tsc server.ts --outDir ./dist --lib ES2015 && docker build -t barbican ."
+    "build": "tsc ./src/index.ts --outDir ./dist --lib ES2015 && docker build -t barbican ."
   },
   "dependencies": {
     "better-sqlite3": "^4.1.0",

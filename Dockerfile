@@ -22,4 +22,4 @@ COPY dist ./
 
 EXPOSE 4321
 
-CMD node server.js
+CMD node .
