@@ -1,5 +1,5 @@
-import Device, * as device from "./device";
-import * as event from "./event";
+import Device, * as device from "../device";
+import * as event from "../event";
 
 const check = async (fetcher: device.fetcher, callback: event.consumer, previous: device.Map = {}) => {
     const list = await fetcher();

@@ -2,7 +2,7 @@ import * as fs from "fs";
 
 import * as Canvas from "canvas";
 
-import Event, * as event from "./event";
+import Event, * as event from "../event";
 
 export default function(data: Event[]): string {
     if (data.length < 1) {

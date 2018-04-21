@@ -1,12 +1,10 @@
 import * as get from "lodash.get";
 import * as request from "request-promise";
 
-import Database from "./database";
-import Device, * as device from "./device";
-import Event, * as event from "./event";
+import Database from "../database";
+import Device, * as device from "../device";
+import Event, * as event from "../event";
 import loop from "./loop";
-
-const db = new Database();
 
 const fetcher: device.fetcher = async () => {
     const response = await request({
@@ -30,10 +28,10 @@ const fetcher: device.fetcher = async () => {
         .filter(({ connections }) => {
             return !!connections.length;
         })
-        // remove noise
-        // .filter(({ friendlyName }) => {
-        //     return !friendlyName.match(pattern);
-        // })
+        //  // remove noise
+        //  .filter(({ friendlyName }) => {
+        //      return !friendlyName.match(pattern);
+        //  })
         // remove the router
         .filter(({ model }) => {
             if (!model || !model.description) {
@@ -47,10 +45,13 @@ const fetcher: device.fetcher = async () => {
         });
 };
 
-const consumer = (e: Event) => {
-    return db.insertEvent(e);
-};
-
-export default function() {
-    loop(fetcher, consumer);
+export default function(db: Database) {
+    let sent = false;
+    loop(fetcher, (e: Event) => {
+        if (!sent) {
+            console.log("Monitor started!");
+            sent = true;
+        }
+        return db.insertEvent(e);
+    });
 }

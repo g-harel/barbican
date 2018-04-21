@@ -20,6 +20,6 @@ RUN npm install --only=production
 # not done earlier to use cached npm install on re-builds
 COPY dist ./
 
-EXPOSE 3210
+EXPOSE 4321
 
 CMD node server.js
